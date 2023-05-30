@@ -23,7 +23,7 @@ public class pizzaController {
 	@Autowired
 	private PizzaService pizzaService;
 	
-	@GetMapping("/")
+	@GetMapping("/pizze")
 	public String index(Model model) {
 		
 		List<Pizza> pizze = pizzaService.findAll();
@@ -34,7 +34,7 @@ public class pizzaController {
 	}
 	
 	
-	@GetMapping("/pizza/{id}")
+	@GetMapping("/pizze/{id}")
 	public String show(
 			Model model,
 			@PathVariable("id") int id
@@ -48,21 +48,21 @@ public class pizzaController {
 		return "show";
 	}	
 
-	@GetMapping("pizza/create")
+	@GetMapping("pizze/create")
 	public String getCreate() {
 		
 		return "create";
 	}
 	
-	@PostMapping("pizza/create")
+	@PostMapping("pizze/create")
 	public String storeBook(@ModelAttribute Pizza pizza) {
 		
 		pizzaService.save(pizza);
 		
-		return "redirect:/pizza";
+		return "redirect:/pizze/" + pizza.getId();
 	}
 	
-	@PostMapping("/pizza/filter")
+	@PostMapping("/pizze/filter")
 	public String indexFiltro(Model model,@RequestParam(required = false) String nome) {
 		
 		List<Pizza> pizze = pizzaService.findByNome(nome);
@@ -70,7 +70,38 @@ public class pizzaController {
 		model.addAttribute("pizze", pizze);
 		model.addAttribute("nome",nome);
 		
-		return "pizzaIndex";
+		return "index";
+	}
+	
+	@GetMapping("/pizze/update/{id}")
+	public String editPizza(
+			Model model,
+			@PathVariable int id
+		) {
+		
+		Optional<Pizza> pizzaOpt = pizzaService.findById(id);
+		Pizza pizza = pizzaOpt.get();
+		model.addAttribute("pizza", pizza);
+		
+		return "update";
+	}
+	@PostMapping("/pizze/update/{id}")
+	public String updatePizza(
+			@PathVariable int id,
+			@ModelAttribute Pizza pizza
+		) {
+		
+		pizzaService.save(pizza);
+		
+		return "redirect:/pizze/" + pizza.getId();
+	}
+	
+	@GetMapping("pizze/delete/{id}")
+	public String deletePizza(@PathVariable int id) {
+		Optional<Pizza> pizzaOpt = pizzaService.findById(id);
+		Pizza pizza = pizzaOpt.get();
+		pizzaService.deletePizza(pizza);
+		return "redirect:/pizze";
 	}
 }
 
